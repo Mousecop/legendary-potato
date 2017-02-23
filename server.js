@@ -29,6 +29,43 @@ app.get('/posts',(req, res) => {
         });
 });
 
+app.get('/posts/:id', (req, res) => {
+  BlogPost
+      .findById(req.params.id)
+      .exec()
+      .then(posts => res.json(posts.apiRepr()))
+      .catch(err => {
+          console.error(err);
+          res.status(500).json({message: 'Internal Service Error'})
+      });
+});
+
+app.post('/posts/', (req, res) => {
+  const requiredFields = ['title', 'author', 'content'];
+
+  for(let i = 0; i < requiredFields.length; i++) {
+    const field = requiredFields[i];
+    if(!(field in req.body)){
+      const message = `Missing ${field}, your post is rejected`;
+      console.error(message);
+      return res.status(400).send(message);
+    }
+  }
+  BlogPost
+    .create({
+      title: req.body.title,
+      author: req.body.author,
+      content: req.body.content
+    })
+    .then(posts => {
+      res.status(201).json(posts.apiRepr())
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({message: 'internal server error' + err})
+    });
+});
+
 
 
 

@@ -11,8 +11,14 @@ const blogPostSchema = mongoose.Schema({
 });
 
 blogPostSchema.virtual('authorName').get(function(){
+
     return this.author.firstName + ' ' + this.author.lastName;
-});
+})
+  .set(function(authorName) {
+    const [first, last] = authorName.split(' ');
+    this.author.firstName = first;
+    this.author.lastName = last;
+  })
 
 blogPostSchema.methods.apiRepr = function() {
     return {
